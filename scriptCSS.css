@@ -1,0 +1,42 @@
+
+
+  html, body { margin:0; padding:0; overflow:hidden; }
+svg { position:fixed; top:0; left:0; background-color: #4242e4  ;}
+
+  .sphere {
+    fill: #4242e4;
+  }
+  #map {
+    width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+  } 
+  .country {
+    stroke: black;
+    stroke-width: 0.1;
+  }
+
+  .country:hover {
+    fill:blue; 
+  }
+
+  .country.highlighted {
+    stroke: black;
+    stroke-width: 1px;
+  }
+
+  .country, .tick {
+    cursor: pointer;
+  }
+
+  .tick text {
+    font-size: 1em;
+    fill: "black";
+    font-family: sans-serif;
+  }
+  
+  
+  .tick circle {
+    stroke: black;
+    stroke-opacity: 0.5;
+  }
