@@ -44,22 +44,35 @@ const colorLegend = (selection, props) => {
   //////////////////////////////////////////////////
 
  ///////////////////////// LoadAndProcessData FILE
-const objectNotDefined = { "": "22632", goodDate: "Other", goodCountry: "Other", goodGenre: "Other", goodISO: "Other", deezerFans: "Other" }
-
-test = d3.tsv('http://127.0.0.1:5500/dataGroupBy.tsv')
+const objectNotDefined = { "": "22632", "goodDate": "Other", "goodCountry": "Other", "goodGenre": "Other", "goodISO": "Other", "deezerFans": "Other" }
+var year = 2008
 const loadAndProcessData = () =>
 Promise.all([
   //d3.tsv('https://unpkg.com/world-atlas@1.1.4/world/50m.json'),
     d3.csv('http://127.0.0.1:5500/dataGroupBy.csv'),
     d3.json('https://unpkg.com/world-atlas@1.1.4/world/50m.json')
 ]).then(([tsvData, topoJSONdata]) => {
+    const countries = topojson.feature(topoJSONdata, topoJSONdata.objects.countries);
     const rowById = {}
     tsvData.forEach(d => {
       rowById[d.goodISO] = d;
     });
-    const countries = topojson.feature(topoJSONdata, topoJSONdata.objects.countries);
     countries.features.forEach(d => {
-        Object.assign(d.properties, d.id in rowById ? rowById[d.id] : objectNotDefined);
+      var newdata = tsvData.filter(function(row) {return row.goodISO == d.id && row.goodDate == year && row.goodGenre != "Other"});
+      var max = d3.max(newdata, function(row) { return row.deezerFans});
+      var filterData = newdata.filter(function(row) {return row.deezerFans == max});
+     //   Object.assign(d.properties, filterData.length > 0 ? objectNotDefined : objectNotDefined); 
+      var line;
+      if (filterData.length > 0) {
+        line = {"": "22632","goodDate": filterData[0].goodDate, "goodCountry": filterData[0].goodCountry, "goodGenre": filterData[0].goodGenre, 
+        "goodISO": filterData[0].goodISO, "deezerFans": filterData[0].deezerFans}
+      } else {
+        line =  d.id in rowById ?  rowById[d.id] : objectNotDefined;
+      }
+      //Object.assign(d.properties, d.id in rowById ? rowById[d.id] : objectNotDefined);
+      Object.assign(d.properties, line); 
+        //Object.assign(d.properties, d.id in rowById ? rowById[d.id] : console.log("yo"));
+  
     });
     return countries;
 });
@@ -80,7 +93,7 @@ const choroplethMapG = svg.append("g")
 .attr('id', 'map');
 
 const colorLegendG = svg.append("g")
-.attr('transform',`translate(100,500)`);
+.attr('transform',`translate(100,100)`);
 
 
 const colorScale = d3.scaleOrdinal();
@@ -116,7 +129,7 @@ loadAndProcessData().then(countries => {
 const render = () => {
   colorScale.domain(features.map(colorValue));
     colorScale.domain(colorScale.domain().sort().reverse())
-    .range(d3.schemeRdYlGn[colorScale.domain().length]);
+    .range(d3.schemeRdYlGn[5]);
 
     colorLegendG.call(colorLegend, {
         colorScale,
@@ -187,7 +200,7 @@ countryPaths
     }
   })
    countryPathsEnter.append("title")
-   .text(d => d.properties.name + ": " + colorValue(d));
+   .text(d => d.properties.goodCountry + ": " + colorValue(d));
 
    
  };
