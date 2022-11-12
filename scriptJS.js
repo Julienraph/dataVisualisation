@@ -45,7 +45,7 @@ const colorLegend = (selection, props) => {
 
  ///////////////////////// LoadAndProcessData FILE
 const objectNotDefined = { "": "22632", "goodDate": "Other", "goodCountry": "Other", "goodGenre": "Other", "goodISO": "Other", "deezerFans": "Other" }
-var year = 2008
+var year = 2011
 const loadAndProcessData = () =>
 Promise.all([
   //d3.tsv('https://unpkg.com/world-atlas@1.1.4/world/50m.json'),
@@ -59,6 +59,7 @@ Promise.all([
     });
     countries.features.forEach(d => {
       var newdata = tsvData.filter(function(row) {return row.goodISO == d.id && row.goodDate == year && row.goodGenre != "Other"});
+     // console.log(newdata)
       var max = d3.max(newdata, function(row) { return row.deezerFans});
       var filterData = newdata.filter(function(row) {return row.deezerFans == max});
      //   Object.assign(d.properties, filterData.length > 0 ? objectNotDefined : objectNotDefined); 
@@ -66,8 +67,9 @@ Promise.all([
       if (filterData.length > 0) {
         line = {"": "22632","goodDate": filterData[0].goodDate, "goodCountry": filterData[0].goodCountry, "goodGenre": filterData[0].goodGenre, 
         "goodISO": filterData[0].goodISO, "deezerFans": filterData[0].deezerFans}
+        console.log(line)
       } else {
-        line =  d.id in rowById ?  rowById[d.id] : objectNotDefined;
+        line =  objectNotDefined;
       }
       //Object.assign(d.properties, d.id in rowById ? rowById[d.id] : objectNotDefined);
       Object.assign(d.properties, line); 
@@ -104,6 +106,20 @@ const colorValue = d => {
 let selectedColorValue;
 let features; 
 let selectedCountryId;
+
+var slider = document.getElementById("slider");
+var output = document.getElementById("demo");
+output.innerHTML = slider.value;
+
+slider.oninput = function() {
+
+  output.innerHTML = this.value;
+  year = slider.value
+  loadAndProcessData().then(countries => {
+    features = countries.features;
+    render();
+  });
+}
 
 const onClick = d => {
   if(d != null) {
@@ -184,8 +200,9 @@ const render = () => {
   }));
  const countryPaths = g.selectAll('.country').data(features);   
  const countryPathsEnter = countryPaths
- .enter().append('path')
-   .attr('class', 'country')
+ .enter()
+   .append('path')
+   .attr('class', 'country') 
 countryPaths
  .merge(countryPathsEnter)
  .attr('d', pathGenerator)
@@ -199,8 +216,4 @@ countryPaths
     onCountryClick(d.id);
     }
   })
-   countryPathsEnter.append("title")
-   .text(d => d.properties.goodCountry + ": " + colorValue(d));
-
-   
  };
