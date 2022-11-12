@@ -44,7 +44,7 @@ const colorLegend = (selection, props) => {
   //////////////////////////////////////////////////
 
  ///////////////////////// LoadAndProcessData FILE
-
+const objectNotDefined = { "": "22632", goodDate: "Other", goodCountry: "Other", goodGenre: "Other", goodISO: "Other", deezerFans: "Other" }
 
 test = d3.tsv('http://127.0.0.1:5500/dataGroupBy.tsv')
 const loadAndProcessData = () =>
@@ -59,7 +59,7 @@ Promise.all([
     });
     const countries = topojson.feature(topoJSONdata, topoJSONdata.objects.countries);
     countries.features.forEach(d => {
-        Object.assign(d.properties, rowById[d.id]);
+        Object.assign(d.properties, d.id in rowById ? rowById[d.id] : objectNotDefined);
     });
     return countries;
 });
@@ -85,7 +85,7 @@ const colorLegendG = svg.append("g")
 
 const colorScale = d3.scaleOrdinal();
 const colorValue = d => {
-  d.properties.id;
+  console.log(d.properties.goodGenre)
 }
 
 let selectedColorValue;
