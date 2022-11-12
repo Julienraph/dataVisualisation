@@ -49,19 +49,17 @@ const colorLegend = (selection, props) => {
 test = d3.tsv('http://127.0.0.1:5500/dataGroupBy.tsv')
 const loadAndProcessData = () =>
 Promise.all([
-  d3.tsv('https://unpkg.com/world-atlas@1.1.4/world/50m.json'),
-  //  d3.tsv('http://127.0.0.1:5500/dataGroupBy.tsv'),
+  //d3.tsv('https://unpkg.com/world-atlas@1.1.4/world/50m.json'),
+    d3.csv('http://127.0.0.1:5500/dataGroupBy.csv'),
     d3.json('https://unpkg.com/world-atlas@1.1.4/world/50m.json')
 ]).then(([tsvData, topoJSONdata]) => {
     const rowById = {}
     tsvData.forEach(d => {
-      rowById[d.id] = d;
-      console.log(rowById[d.id])
+      rowById[d.goodISO] = d;
     });
     const countries = topojson.feature(topoJSONdata, topoJSONdata.objects.countries);
     countries.features.forEach(d => {
         Object.assign(d.properties, rowById[d.goodISO]);
-      
     });
     return countries;
 });
@@ -87,7 +85,7 @@ const colorLegendG = svg.append("g")
 
 const colorScale = d3.scaleOrdinal();
 const colorValue = d => {
-  console.log(d.properties.goodGenre)
+  console.log(d.properties)
   d.properties.goodGenre;
 }
 
