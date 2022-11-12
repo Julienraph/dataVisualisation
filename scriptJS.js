@@ -85,7 +85,7 @@ const colorLegendG = svg.append("g")
 
 const colorScale = d3.scaleOrdinal();
 const colorValue = d => {
-  console.log(d.properties.goodGenre)
+  return d.properties.goodGenre
 }
 
 let selectedColorValue;
