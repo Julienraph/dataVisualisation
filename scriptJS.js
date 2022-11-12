@@ -208,8 +208,20 @@ countryPaths
  .attr('d', pathGenerator)
  .attr("fill",d => colorScale(colorValue(d)))
   .attr('opacity', d => (!selectedColorValue && ! selectedCountryId) || selectedColorValue === colorValue(d) || selectedCountryId === d.id ? 1 : 0.1)
-  .classed('highlighted', d => (selectedColorValue || selectedCountryId ) && (selectedColorValue == colorValue(d)) || selectedCountryId === d.id)
-  .on("click", d => {
+  .classed('highlighted', d => (selectedColorValue || selectedCountryId ) && (selectedColorValue == colorValue(d)) || selectedCountryId === d.id);
+  
+  countryPathsEnter.append("title").attr("class","title")
+
+  g.selectAll('.country').data(features).select(".title").text(function(d) {  
+    return d.properties.goodCountry + ": " + colorValue(d)
+});
+
+
+ 
+
+  countryPaths
+  .merge(countryPathsEnter)
+   .on("click", d => {
     if (selectedCountryId && selectedCountryId === d.id) {
       onCountryClick(null);
     } else {
