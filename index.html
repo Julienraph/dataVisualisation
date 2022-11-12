@@ -7,9 +7,26 @@
     <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.min.js"></script>
 </head>
 <body>
-<div>
-<svg width="100" height="100"></svg>
+
+  <svg width="100" height="100"></svg>
+<div id="mySidepanel" class="sidepanel">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+  <a href="#">About</a>
+  <a href="#">Services</a>
+  <a href="#">Clients</a>
+  <a href="#">Contact</a>
 </div>
+<button class="openbtn" onclick="openNav()">☰ Toggle Sidepanel</button>  
+
+<script>
+function openNav() {
+  document.getElementById("mySidepanel").style.width = "250px";
+}
+
+function closeNav() {
+  document.getElementById("mySidepanel").style.width = "0";
+}
+</script>
   <script src="scriptJS.js"></script> 
   </body>
 </html>
