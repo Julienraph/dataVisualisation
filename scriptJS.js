@@ -59,7 +59,7 @@ Promise.all([
     });
     const countries = topojson.feature(topoJSONdata, topoJSONdata.objects.countries);
     countries.features.forEach(d => {
-        Object.assign(d.properties, rowById[d.goodISO]);
+        Object.assign(d.properties, rowById[d.id]);
     });
     return countries;
 });
@@ -85,8 +85,7 @@ const colorLegendG = svg.append("g")
 
 const colorScale = d3.scaleOrdinal();
 const colorValue = d => {
-  console.log(d.properties)
-  d.properties.goodGenre;
+  d.properties.id;
 }
 
 let selectedColorValue;
