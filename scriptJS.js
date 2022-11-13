@@ -16,7 +16,7 @@ const colorLegend = (selection, props) => {
         .attr("fill", "white")
         .attr("opacity",0.8);
     const groups = selection.selectAll('g')
-      .data(currentDomainGenre.sort());
+      .data(currentDomainGenre.sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'})));
     const groupsEnter = groups.enter().append('g').attr("class","tick")
     groupsEnter
       .merge(groups)
@@ -26,7 +26,7 @@ const colorLegend = (selection, props) => {
         .attr('opacity', d => 
         (!selectedColorValue || d === selectedColorValue) ? 1 : 0.2)
         .on('click', d => onClick(
-          d== selectedColorValue ? null : d
+          d == selectedColorValue ? null : d
         ));
     groups.exit().remove();
     
@@ -37,7 +37,7 @@ const colorLegend = (selection, props) => {
     
     groupsEnter.append('text')
       .merge(groups.select('text'))
-        .text(d => d.charAt(0).toUpperCase() + d.slice(1))
+        .text(d => d.charAt(0).toUpperCase() + d.toLowerCase().slice(1))
         .attr("dy","0.32em")
         .attr('x', textOffSet);
   }
@@ -59,7 +59,7 @@ Promise.all([
     const rowById = {}
     const rowByIdCountry = {}
     rangeColor = []
-    domainColor = [...new Set(tsvData.map(item => item.goodGeneralGenre.toLowerCase()))]
+    domainColor = [...new Set(tsvData.map(item => item.goodGeneralGenre))]
     for (let i = 0; i < domainColor.length; i++) {
       rangeColor.push(d3.interpolateSinebow(i/domainColor.length))
     }
@@ -128,7 +128,7 @@ slider.oninput = function() {
   output.innerHTML = this.value;
   year = slider.value
   loadAndProcessData().then(countries => {
-    currentDomainGenre = [...new Set(countries.features.map(item => item.properties.goodGeneralGenre.toLowerCase()))]
+    currentDomainGenre = [...new Set(countries.features.map(item => item.properties.goodGeneralGenre))]
     features = countries.features;
     render();
   });
@@ -152,7 +152,7 @@ const onCountryClick = id => {
 
 loadAndProcessData().then(countries => {
   features = countries.features;
-  currentDomainGenre = [...new Set(countries.features.map(item => item.properties.goodGeneralGenre.toLowerCase()))]
+  currentDomainGenre = [...new Set(countries.features.map(item => item.properties.goodGeneralGenre))]
   render();
 });
 
