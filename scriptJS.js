@@ -44,7 +44,7 @@ const colorLegend = (selection, props) => {
   //////////////////////////////////////////////////
 
  ///////////////////////// LoadAndProcessData FILE
-const objectNotDefined = { "": "22632", "goodDate": "Other", "goodCountry": "Other", "goodGenre": "Other", "goodISO": "Other", "deezerFans": "Other" }
+const objectNotDefined = { "": "22632", "goodDate": "Undefined", "goodCountry": "Undefined", "goodGenre": "Undefined", "goodISO": "Undefined", "goodGeneralGenre" : "Undefined","deezerFans": "Undefined" }
 var year = 2011
 const loadAndProcessData = () =>
 Promise.all([
@@ -58,16 +58,15 @@ Promise.all([
       rowById[d.goodISO] = d;
     });
     countries.features.forEach(d => {
-      var newdata = tsvData.filter(function(row) {return row.goodISO == d.id && row.goodDate == year && row.goodGenre != "Other"});
+      var newdata = tsvData.filter(function(row) {return row.goodISO == d.id && row.goodDate == year && row.goodGeneralGenre != "Other" && row.goodGeneralGenre != "Undefined"});
      // console.log(newdata)
       var max = d3.max(newdata, function(row) { return row.deezerFans});
       var filterData = newdata.filter(function(row) {return row.deezerFans == max});
      //   Object.assign(d.properties, filterData.length > 0 ? objectNotDefined : objectNotDefined); 
       var line;
       if (filterData.length > 0) {
-        line = {"": "22632","goodDate": filterData[0].goodDate, "goodCountry": filterData[0].goodCountry, "goodGenre": filterData[0].goodGenre, 
+        line = {"": "22632","goodDate": filterData[0].goodDate, "goodCountry": filterData[0].goodCountry, "goodGeneralGenre": filterData[0].goodGeneralGenre, 
         "goodISO": filterData[0].goodISO, "deezerFans": filterData[0].deezerFans}
-        console.log(line)
       } else {
         line =  objectNotDefined;
       }
@@ -82,13 +81,12 @@ Promise.all([
 var width = window.innerWidth
     height = window.innerHeight
 const svg = d3.select('svg')
-  .attr("width", width)
-  .attr("height", height)
+  .attr("width", "100%")
+  .attr("height", "100%")
   .attr('transform','transalate(',width,height,')')
 
 const projection = d3.geoNaturalEarth1();
 const pathGenerator = d3.geoPath().projection(projection);
-
 
 const choroplethMapG = svg.append("g")
 .attr('transform', 'scale(2)')
@@ -101,7 +99,7 @@ const colorLegendG = svg.append("g")
 
 const colorScale = d3.scaleOrdinal();
 const colorValue = d => {
-  return d.properties.goodGenre
+  return d.properties.goodGeneralGenre
 }
 
 let selectedColorValue;
@@ -138,15 +136,23 @@ const onCountryClick = id => {
   render();
 }
 
+
+
+
 loadAndProcessData().then(countries => {
   features = countries.features;
   render();
 });
 
 const render = () => {
+  var rangeColor = []
+  var rangeGeneralGenre = [...new Set(features.map(item => item.properties.goodGeneralGenre))]
+  for (let i = 0; i < rangeGeneralGenre.length; i++) {
+    rangeColor.push(d3.interpolateSinebow(i/rangeGeneralGenre.length))
+  }
   colorScale.domain(features.map(colorValue));
     colorScale.domain(colorScale.domain().sort().reverse())
-    .range(d3.schemeRdYlGn[5]);
+    .range(rangeColor);
 
     colorLegendG.call(colorLegend, {
         colorScale,
