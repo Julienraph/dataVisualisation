@@ -95,7 +95,8 @@ const choroplethMapG = svg.append("g")
 .attr('id', 'map');
 
 const colorLegendG = svg.append("g")
-.attr('transform',`translate(100,100)`);
+.attr('transform',`translate(80,220)`);
+
 
 
 const colorScale = d3.scaleOrdinal();
@@ -198,7 +199,7 @@ const render = () => {
   selection.call(d3.zoom().scaleExtent([1, Infinity]).translateExtent([[0,0],[width,height]]).on("zoom", () => {
   g.attr("transform",d3.event.transform);
   }));
- const countryPaths = g.selectAll('.country').data(features);   
+ const countryPaths = g.selectAll('.country').data(features.filter(d =>d.id !== "010"));   
  const countryPathsEnter = countryPaths
  .enter()
    .append('path')
@@ -212,12 +213,9 @@ countryPaths
   
   countryPathsEnter.append("title").attr("class","title")
 
-  g.selectAll('.country').data(features).select(".title").text(function(d) {  
+  g.selectAll('.country').data(features.filter(d =>d.id !== "010")).select(".title").text(function(d) {  
     return d.properties.goodCountry + ": " + colorValue(d)
 });
-
-
- 
 
   countryPaths
   .merge(countryPathsEnter)

@@ -91,13 +91,20 @@ div {position: relative;}
   }
 
   .slidecontainer {
-    width: 100%;
+    position: fixed;
+    margin: 44% 25% 25% 27%;
+    width: 70%
+}
+
+#textYear {
+  color: white;
+  margin-top:0%
 }
 
 .slider {
     -webkit-appearance: none;
     width: 65%;
-    height: 25px;
+    height: 15px;
     background: #d3d3d3;
     outline: none;
     opacity: 0.7;
@@ -124,3 +131,4 @@ div {position: relative;}
     background: #838383;
     cursor: pointer;
 }
+
