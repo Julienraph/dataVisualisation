@@ -37,7 +37,7 @@ const colorLegend = (selection, props) => {
     
     groupsEnter.append('text')
       .merge(groups.select('text'))
-        .text(d => d)
+        .text(d => d.charAt(0).toUpperCase() + d.slice(1))
         .attr("dy","0.32em")
         .attr('x', textOffSet);
   }
