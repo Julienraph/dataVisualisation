@@ -65,7 +65,7 @@ Promise.all([
      //   Object.assign(d.properties, filterData.length > 0 ? objectNotDefined : objectNotDefined); 
       var line;
       if (filterData.length > 0) {
-        line = {"": "22632","goodDate": filterData[0].goodDate, "goodCountry": filterData[0].goodCountry, "goodGeneralGenre": filterData[0].goodGeneralGenre, 
+        line = {"": "22632","goodDate": filterData[0].goodDate, "goodCountry": filterData[0].goodCountry, "goodGenre": filterData[0].goodGenre, "goodGeneralGenre": filterData[0].goodGeneralGenre, 
         "goodISO": filterData[0].goodISO, "deezerFans": filterData[0].deezerFans}
       } else {
         line =  objectNotDefined;
@@ -220,7 +220,10 @@ countryPaths
   countryPathsEnter.append("title").attr("class","title")
 
   g.selectAll('.country').data(features.filter(d =>d.id !== "010")).select(".title").text(function(d) {  
-    return d.properties.goodCountry + ": " + colorValue(d)
+    var countryUppercase = d.properties.goodCountry.charAt(0).toUpperCase() + d.properties.goodCountry.slice(1);
+    var generalGenreUppercase = colorValue(d).charAt(0).toUpperCase() + colorValue(d).slice(1);
+    var genreUppercase = d.properties.goodGenre.charAt(0).toUpperCase() + d.properties.goodGenre.slice(1);
+    return countryUppercase + ": " + generalGenreUppercase + " - " + genreUppercase
 });
 
   countryPaths
