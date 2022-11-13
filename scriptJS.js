@@ -1,11 +1,11 @@
 //////////////////     COLOR LEGEND FILE
 const colorLegend = (selection, props) => {
-    const { colorScale, circleRadius, spacing, textOffSet, backgroundRectWidth, onClick, selectedColorValue } = props;
+    const { colorScale, circleRadius, spacing, textOffSet, backgroundRectWidth, onClick, selectedColorValue, currentDomainGenre } = props;
   
 
     const backgroundRect = selection.selectAll("rect")
     .data([null]);
-    const n = colorScale.domain().length
+    const n = currentDomainGenre.length
     backgroundRect.enter().append('rect')
     .merge(backgroundRect)
         .attr("x", -circleRadius * 2)
@@ -16,7 +16,7 @@ const colorLegend = (selection, props) => {
         .attr("fill", "white")
         .attr("opacity",0.8);
     const groups = selection.selectAll('g')
-      .data(colorScale.domain());
+      .data(currentDomainGenre.sort());
     const groupsEnter = groups.enter().append('g').attr("class","tick")
     groupsEnter
       .merge(groups)
@@ -44,18 +44,31 @@ const colorLegend = (selection, props) => {
   //////////////////////////////////////////////////
 
  ///////////////////////// LoadAndProcessData FILE
-const objectNotDefined = { "": "22632", "goodDate": "Undefined", "goodCountry": "Undefined", "goodGenre": "Undefined", "goodISO": "Undefined", "goodGeneralGenre" : "Undefined","deezerFans": "Undefined" }
 var year = 2011
+var rangeColor = []
+var domainColor
+var currentDomainGenre
 const loadAndProcessData = () =>
 Promise.all([
   //d3.tsv('https://unpkg.com/world-atlas@1.1.4/world/50m.json'),
     d3.csv('http://127.0.0.1:5500/dataGroupBy.csv'),
-    d3.json('https://unpkg.com/world-atlas@1.1.4/world/50m.json')
-]).then(([tsvData, topoJSONdata]) => {
+    d3.json('https://unpkg.com/world-atlas@1.1.4/world/50m.json'),
+    d3.tsv('https://unpkg.com/world-atlas@1.1.4/world/50m.tsv')
+]).then(([tsvData, topoJSONdata,tsvCountryData]) => {
     const countries = topojson.feature(topoJSONdata, topoJSONdata.objects.countries);
     const rowById = {}
+    const rowByIdCountry = {}
+    rangeColor = []
+    domainColor = [...new Set(tsvData.map(item => item.goodGeneralGenre.toLowerCase()))]
+    for (let i = 0; i < domainColor.length; i++) {
+      rangeColor.push(d3.interpolateSinebow(i/domainColor.length))
+    }
+
     tsvData.forEach(d => {
       rowById[d.goodISO] = d;
+    });
+    tsvCountryData.forEach(d => {
+      rowByIdCountry[d.iso_n3] = d;
     });
     countries.features.forEach(d => {
       var newdata = tsvData.filter(function(row) {return row.goodISO == d.id && row.goodDate == year && row.goodGeneralGenre != "Other" && row.goodGeneralGenre != "Undefined"});
@@ -68,7 +81,7 @@ Promise.all([
         line = {"": "22632","goodDate": filterData[0].goodDate, "goodCountry": filterData[0].goodCountry, "goodGenre": filterData[0].goodGenre, "goodGeneralGenre": filterData[0].goodGeneralGenre, 
         "goodISO": filterData[0].goodISO, "deezerFans": filterData[0].deezerFans}
       } else {
-        line =  objectNotDefined;
+        line =  { "": "22632", "goodDate": "Undefined", "goodCountry": rowByIdCountry[d.id].name, "goodGenre": "Undefined", "goodISO": "Undefined", "goodGeneralGenre" : "Undefined","deezerFans": "Undefined" };
       }
       //Object.assign(d.properties, d.id in rowById ? rowById[d.id] : objectNotDefined);
       Object.assign(d.properties, line); 
@@ -115,6 +128,7 @@ slider.oninput = function() {
   output.innerHTML = this.value;
   year = slider.value
   loadAndProcessData().then(countries => {
+    currentDomainGenre = [...new Set(countries.features.map(item => item.properties.goodGeneralGenre.toLowerCase()))]
     features = countries.features;
     render();
   });
@@ -136,22 +150,15 @@ const onCountryClick = id => {
   render();
 }
 
-
-
-
 loadAndProcessData().then(countries => {
   features = countries.features;
+  currentDomainGenre = [...new Set(countries.features.map(item => item.properties.goodGeneralGenre.toLowerCase()))]
   render();
 });
 
 const render = () => {
-  var rangeColor = []
-  var rangeGeneralGenre = [...new Set(features.map(item => item.properties.goodGeneralGenre))]
-  for (let i = 0; i < rangeGeneralGenre.length; i++) {
-    rangeColor.push(d3.interpolateSinebow(i/rangeGeneralGenre.length))
-  }
-  colorScale.domain(features.map(colorValue));
-    colorScale.domain(colorScale.domain().sort().reverse())
+  colorScale.domain(domainColor);
+    colorScale.domain(colorScale.domain().sort())
     .range(rangeColor);
 
     colorLegendG.call(colorLegend, {
@@ -161,7 +168,8 @@ const render = () => {
         textOffSet: 12,
         backgroundRectWidth: 235,
         onClick, 
-        selectedColorValue
+        selectedColorValue,
+        currentDomainGenre
     });  
 
     choroplethMapG.call(choroplethMap, {
