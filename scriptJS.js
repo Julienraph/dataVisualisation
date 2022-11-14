@@ -242,7 +242,7 @@ countryPaths
     var countryUppercase = d.properties.goodCountry.charAt(0).toUpperCase() + d.properties.goodCountry.slice(1);
     var generalGenreUppercase = colorValue(d).charAt(0).toUpperCase() + colorValue(d).slice(1);
     var genreUppercase = d.properties.goodGenre.charAt(0).toUpperCase() + d.properties.goodGenre.slice(1);
-    return countryUppercase + ": " + generalGenreUppercase + " - " + genreUppercase
+    return "Country: " + countryUppercase + "\n" + "Genre" + ": " + generalGenreUppercase + " - " + genreUppercase + "\n" + "Deezer fans: " + d.properties.deezerFans
 });
 
   countryPaths
