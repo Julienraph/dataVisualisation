@@ -30,10 +30,16 @@ const colorLegend = (selection, props) => {
         ));
     groups.exit().remove();
     
+   
     groupsEnter.append('circle')
       .merge(groups.select('circle'))
         .attr('r', circleRadius)
-        .attr('fill', d => colorScale(d));
+        .attr("fill",d => {
+          if(d != "Undefined") {
+          return colorScale(d)
+          } else {
+            return "rgb(107,107,107)"
+          }})
     
     groupsEnter.append('text')
       .merge(groups.select('text'))
@@ -221,7 +227,12 @@ const render = () => {
 countryPaths
  .merge(countryPathsEnter)
  .attr('d', pathGenerator)
- .attr("fill",d => colorScale(colorValue(d)))
+ .attr("fill",d => {
+  if(d.properties.goodGeneralGenre != "Undefined") {
+  return colorScale(colorValue(d))
+  } else {
+    return "rgb(107,107,107)"
+  }})
   .attr('opacity', d => (!selectedColorValue && ! selectedCountryId) || selectedColorValue === colorValue(d) || selectedCountryId === d.id ? 1 : 0.1)
   .classed('highlighted', d => (selectedColorValue || selectedCountryId ) && (selectedColorValue == colorValue(d)) || selectedCountryId === d.id);
   

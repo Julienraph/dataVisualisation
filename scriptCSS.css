@@ -19,8 +19,9 @@ div {position: relative;}
   }
 
   .country:hover {
-    fill:rgb(186, 186, 199); 
-    stroke-width: 0.5;
+    stroke: white;
+    filter: brightness(110%);
+    stroke-width: 0.9;
   }
 
   .country.highlighted {
