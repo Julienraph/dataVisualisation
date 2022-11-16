@@ -17,16 +17,28 @@
     
     <svg></svg>
     
-  
+   
   </div>
+
+  <div id="mySidepanel" class="sidepanel">
+    <button class="openbtn" onclick="openNav()">☰ Toggle Sidepanel</button> 
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+    <h1 id="titre">FRANCE</h1>
+  </div>
+ 
+
+
 
 <script>
 function openNav() {
-  document.getElementById("mySidepanel").style.width = "250px";
+  document.getElementById("mySidepanel").style.width = "500px";
+  document.getElementById("mySidepanel").style.height = "100%";
+  document.getElementById("svgdivid").style.marginLeft = "500px";
 }
 
 function closeNav() {
   document.getElementById("mySidepanel").style.width = "0";
+  document.getElementById("svgdivid").style.marginLeft = "0";
 }
 </script>
   <script src="scriptJS.js"></script> 

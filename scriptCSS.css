@@ -6,7 +6,7 @@ div {position: relative;}
 
 
 #svgdivid {
-  margin-left: 250px;
+ 
 }
   .sphere {
     fill: #14144b;
@@ -40,6 +40,10 @@ div {position: relative;}
     cursor: pointer;
   }
 
+  #titre{
+    text-align: center;
+  }
+
   .tick text {
     font-size: 1em;
     fill: "black";
@@ -52,14 +56,14 @@ div {position: relative;}
     stroke-opacity: 0.5;
   }
 
-  .sidepanel  {
+  #mySidepanel  {
     width: 0;
     position: fixed;
-    z-index: 1;
+    z-index: 10;
     height: 250px;
     top: 0;
     left: 0;
-    background-color: #111;
+    background-color: rgb(255, 255, 255);
     overflow-x: hidden;
     transition: 0.5s;
     padding-top: 60px;
@@ -75,17 +79,21 @@ div {position: relative;}
   }
   
   .sidepanel a:hover {
-    color: #f1f1f1;
+    color: #000000;
   }
   
   .sidepanel .closebtn {
     position: absolute;
     top: 0;
-    right: 25px;
+    right: 10px;
     font-size: 36px;
   }
   
   .openbtn {
+    top: 0;
+    left: 0;
+    position: fixed;
+    z-index:10;
     font-size: 20px;
     cursor: pointer;
     background-color: #111;
