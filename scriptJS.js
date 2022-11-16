@@ -97,12 +97,11 @@ Promise.all([
     return countries;
 });
 //////////////////////////////////////////////////
-var width = window.innerWidth
-    height = window.innerHeight
+var width = 1920,
+    height = 1080;
 const svg = d3.select('svg')
-  .attr("width", "100%")
-  .attr("height", "100%")
-  .attr('transform','transalate(',width,height,')')
+.attr("preserveAspectRatio", "xMidYMid")
+.attr("viewBox", "0 0 " + width + " " + height);
 
 const projection = d3.geoNaturalEarth1();
 const pathGenerator = d3.geoPath().projection(projection);
