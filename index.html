@@ -8,15 +8,17 @@
 </head>
 <body>
 
-  <div width="100" height="1000" display="block"> <svg></svg></div>
- 
-
-
-<div class="slidecontainer">
-  <input type="range" min="1947" max="2016" step="1" value="1912" class="slider" id="slider">
-  <br>
-  <p id="textYear"> Year: <span id="demo"></span></p>
-</div>
+  <div width="100" height="1000" display="block" id="svgdivid"> 
+    <div class="slidecontainer">
+      <input type="range" min="1947" max="2016" step="1" value="1912" class="slider" id="slider">
+      <br>
+      <p id="textYear"> Year: <span id="demo"></span></p>
+    </div>
+    
+    <svg></svg>
+    
+  
+  </div>
 
 <script>
 function openNav() {

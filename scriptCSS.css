@@ -1,13 +1,19 @@
 
 
 body {margin:0; padding:0; overflow:hidden; background-color: #14144b; }
-svg { position:fixed; top:0; left:0; z-index: -1; background-color: #14144b;}
+svg { position:relative; top:0; left:0; z-index: 0; background-color: #14144b;}
 div {position: relative;}
 
+
+#svgdivid {
+  margin-left: 250px;
+}
   .sphere {
     fill: #14144b;
     position:absolute;
   }
+
+  
   #map {
     width: 75%;
     margin-left: auto;
@@ -94,6 +100,7 @@ div {position: relative;}
 
   .slidecontainer {
     position: fixed;
+    z-index:1;
     margin: 46% 25% 25% 27%;
     width: 70%
 }
