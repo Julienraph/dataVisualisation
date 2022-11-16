@@ -20,7 +20,7 @@ div {position: relative;}
 
   .country:hover {
     stroke: white;
-    filter: brightness(110%);
+    filter: brightness(120%);
     stroke-width: 0.9;
   }
 
