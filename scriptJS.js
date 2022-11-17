@@ -151,6 +151,9 @@ const onClick = d => {
 const onCountryClick = id => {
   if(id != null) {
     selectedColorValue = null
+    openNav(id);
+  } else {
+    closeNav()
   }
   selectedCountryId = id;
   render();
@@ -256,76 +259,135 @@ countryPaths
   })
  };
 
- function openNav() {
-  var data = {}
-  var newdata = dataTSV.filter(function(row) {return row.goodISO == 250 && row.goodDate == year && row.goodGeneralGenre != "Other" && row.goodGeneralGenre != "Undefined"});
-  console.log(newdata)
-  newdata.forEach(d => {
-    data[d.goodGeneralGenre] = d.deezerFans
-    console.log(d.goodCountry)
-  });
-  console.log(data)
-  //plusieurs meme genre "pop", regrouper et sum deezerfans ?
-  document.getElementById("mySidepanel").style.width = "500px";
-  document.getElementById("mySidepanel").style.height = "100%";
-  document.getElementById("svgdivid").style.marginLeft = "500px";
+ function closeNav() {
+  document.getElementById("mySidepanel").style.width = "0";
+  document.getElementById("svgdivid").style.marginLeft = "0";
+}
 
-
-
+function openNav(countryID) {
  // set the dimensions and margins of the graph
+
+ var data1 = {}
+ var nomCountry
+ var newdata = dataTSV.filter(function(row) {return row.goodISO == countryID && row.goodDate == year && row.goodGeneralGenre != "Other" && row.goodGeneralGenre != "Undefined"});
+ newdata.sort(function(a,b) {
+  return a.deezerFans - b.deezerFans;
+  });
+ newdata.forEach(d => {
+ nomCountry = d.goodCountry
+  data1[d.goodGeneralGenre] = d.deezerFans
+ });
+ 
  var widthPie = 450
  var heightPie = 450
  var marginPie = 40
- 
- // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
- var radius = Math.min(widthPie, heightPie) / 2 - marginPie
- 
- // append the svg object to the div called 'my_dataviz'
- var svgPieChart = d3.select("#mySidepanel")
- .append("svg")
- .attr("width", widthPie)
- .attr("height", heightPie)
- .append("g")
- .attr("transform", "translate(" + widthPie / 2 + "," + heightPie / 2 + ")");
+ //plusieurs meme genre "pop", regrouper et sum deezerfans ?
+ document.getElementById("titre").innerHTML  = nomCountry
+ document.getElementById("mySidepanel").style.width = "500px";
+ document.getElementById("mySidepanel").style.height = "100%";
+ document.getElementById("svgdivid").style.marginLeft = "500px"
 
- 
- // set the color scale
- var color = d3.scaleOrdinal()
- .domain(data)
- .range(d3.schemeSet2);
- 
- // Compute the position of each group on the pie:
- var pie = d3.pie()
- .value(function(d) {return d.value; })
- var data_ready = pie(d3.entries(data))
- // Now I know that group A goes from 0 degrees to x degrees and so on.
- 
- // shape helper to build arcs:
- var arcGenerator = d3.arc()
- .innerRadius(0)
- .outerRadius(radius)
- 
- // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
- svgPieChart
- .selectAll('mySlices')
- .data(data_ready)
- .enter()
- .append('path')
- .attr('d', arcGenerator)
- .attr('fill', function(d){ return(color(d.data.key)) })
- .attr("stroke", "black")
- .style("stroke-width", "2px")
- .style("opacity", 0.7)
- 
- // Now add the annotation. Use the centroid method to get the best coordinates
- svgPieChart
- .selectAll('mySlices')
- .data(data_ready)
- .enter()
- .append('text')
- .text(function(d){ return "grp " + d.data.key})
- .attr("transform", function(d) { return "translate(" + arcGenerator.centroid(d) + ")";  })
- .style("text-anchor", "middle")
- .style("font-size", 17)
+// The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+var radius = Math.min(widthPie, heightPie) / 2 - marginPie
+
+// append the svg object to the div called 'my_dataviz'
+var svgPiechart = d3.select("#mySidepanel")
+.append("svg")
+.attr("width", widthPie)
+.attr("height", heightPie)
+.append("g")
+.attr("transform", "translate(" + widthPie / 2 + "," + heightPie / 2 + ")");
+
+
+var data2 = {a: 6, b: 16, c:20, d:14, e:19, f:12}
+
+// set the color scale
+var color = d3.scaleOrdinal()
+  .domain(data1)
+  .range(d3.schemeSet2);
+
+  var arcGenerator = d3.arc()
+  .innerRadius(0)
+  .outerRadius(radius)
+
+// A function that create / update the plot for a given variable:
+function update(data) {
+
+// Compute the position of each group on the pie:
+var pie = d3.pie()
+.value(function(d) {return d.value; }) // This make sure that group order remains the same in the pie chart
+var data_ready = pie(d3.entries(data))
+
+// map to data
+var u = svgPiechart.selectAll("mySlices")
+.data(data_ready)
+
+// Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+u
+.enter()
+.append('path')
+.merge(u)
+.transition()
+.duration(1000)
+.attr('d', arcGenerator
+)
+.attr('fill', function(d){ return(color(d.data.key)) })
+.attr("stroke", "white")
+.style("stroke-width", "0.1px")
+.style("opacity", 1)
+
+// Now add the annotation. Use the centroid method to get the best coordinates)
+u
+  .enter()
+  .append('text')
+  .merge(u)
+  .text(function(d){ return d.data.key})
+  .attr("transform", function(d) { return "translate(" + arcGenerator.centroid(d) + ")";  })
+  .style("text-anchor", "middle")
+  .style("font-size", 17)
+
+// remove the group that is not present anymore
+u
+.exit()
+.remove()
+
+}
+
+// Initialize the plot with the first dataset
+update(data1)
+
+createLi(data1)
+
+function createLi(data){
+  if (document.getElementById("proList") != null) {
+    document.getElementById("proList").remove()
+  }
+  var ul = document.createElement('ul');
+  ul.setAttribute('id','proList');
+
+  productList = ['Electronics Watch','House wear Items','Kids wear','Women Fashion'];
+
+  console.log(data)
+  document.getElementById('mySidepanel').appendChild(ul);
+
+  for (var key of Object.keys(data)) {
+    console.log(key + " -> " + data[key])
+    var li = document.createElement('li');
+    li.setAttribute('class','item');
+
+    ul.appendChild(li);
+
+    li.innerHTML= key + " a " + data[key] + " fans"  ;
+}
+
+  function renderProductList(element, index, arr) {
+      var li = document.createElement('li');
+      li.setAttribute('class','item');
+
+      ul.appendChild(li);
+
+      li.innerHTML=li.innerHTML + element;
+  }
+}
 
 }
