@@ -144,6 +144,7 @@ let selectedCountryId;
 
 var slider = document.getElementById("slider");
 var output = document.getElementById("demo");
+slider.value = year
 output.innerHTML = slider.value;
 
 slider.oninput = function() {
@@ -316,12 +317,26 @@ var svgPiechart = d3.select("#mySidepanel")
  // set the dimensions and margins of the graph
 
  var data1 = {}
+ var deezerFansTotal = 0;
  var isUndefined = false;
  var nomCountry
  var newdata = dataTSV.filter(function(row) {return row.goodISO == countryID && row.goodDate == year && row.goodGeneralGenre != "Other" && row.goodGeneralGenre != "Undefined"});
+ var result = [];
+      newdata.reduce(function(res, value) {
+           if (!res[value.goodGeneralGenre]) {
+          res[value.goodGeneralGenre] = {goodDate: value.goodDate, goodCountry: value.goodCountry, goodGeneralGenre: value.goodGeneralGenre, goodISO: value.goodISO, deezerFans: 0 };
+          result.push(res[value.goodGeneralGenre])
+        }
+        res[value.goodGeneralGenre].deezerFans += +value.deezerFans;
+        return res;
+      }, {});
+ newdata = result;
  newdata.forEach(d => {
  nomCountry = d.goodCountry
-  data1[d.goodGeneralGenre] = d.deezerFans
+  if(d.deezerFans > 0) {
+    data1[d.goodGeneralGenre] = d.deezerFans
+    deezerFansTotal += d.deezerFans
+  }
  });
   if(Object.keys(data1).length === 0) {
     nomCountry = countriesDataMap[countryID].name_long
@@ -342,7 +357,7 @@ function update(data) {
 
 // Compute the position of each group on the pie:
 var pie = d3.pie()
-.value(function(d) {return d.value; }) // This make sure that group order remains the same in the pie chart
+.value(function(d) {return d.value;}) // This make sure that group order remains the same in the pie chart
 var data_ready = pie(d3.entries(data))
 
 // map to data
@@ -411,8 +426,15 @@ function createLi(data){
 
     ul.appendChild(li);
 
-    li.innerHTML= key + " a " + data[key] + " fans"  ;
+    li.innerHTML= key.charAt(0).toUpperCase() + key.slice(1) + " (" + (data[key] * 100 / deezerFansTotal).toFixed(2) + "%)" + " avec " + data[key] + " fans"  ;
+    li.id = key
   }
 }
-
+const items = document.querySelectorAll('ol > li');
+items.forEach(item => {
+	item.addEventListener('click',(e)=>{
+		console.log(e.target.id);
+	}
+	)
+})
 }
