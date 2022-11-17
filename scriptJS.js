@@ -82,13 +82,28 @@ Promise.all([
     countriesDataMap = rowByIdCountry 
     countries.features.forEach(d => {
       var newdata = tsvData.filter(function(row) {return row.goodISO == d.id && row.goodDate == year && row.goodGeneralGenre != "Other" && row.goodGeneralGenre != "Undefined"});
+   
+      var result = [];
+      newdata.reduce(function(res, value) {
+           if (!res[value.goodGeneralGenre]) {
+          res[value.goodGeneralGenre] = {goodDate: value.goodDate, goodCountry: value.goodCountry, goodGeneralGenre: value.goodGeneralGenre, goodISO: value.goodISO, deezerFans: 0 };
+          result.push(res[value.goodGeneralGenre])
+        }
+        res[value.goodGeneralGenre].deezerFans += +value.deezerFans;
+        return res;
+      }, {});
+      newdata = result;
+ 
       var max = d3.max(newdata, function(row) { return +row.deezerFans});
-      var filterData = newdata.filter(function(row) {return row.deezerFans == max});
+      var filterData = newdata.filter(function(row) {return row.deezerFans == max}); 
+      var totalDeezerFans = filterData.reduce((total, obj) => obj.deezerFans + total,0)
      //   Object.assign(d.properties, filterData.length > 0 ? objectNotDefined : objectNotDefined); 
       var line;
       if (filterData.length > 0) {
+        var filterDataGenre = newdata.filter(function(row) {return row.goodGeneralGenre == filterData[0].goodGeneralGenre});
+        
         line = {"": "22632","goodDate": filterData[0].goodDate, "goodCountry": filterData[0].goodCountry, "goodGenre": filterData[0].goodGenre, "goodGeneralGenre": filterData[0].goodGeneralGenre, 
-        "goodISO": filterData[0].goodISO, "deezerFans": filterData[0].deezerFans}
+        "goodISO": filterData[0].goodISO, "deezerFans": totalDeezerFans}
       } else {
         line =  { "": "22632", "goodDate": "Undefined", "goodCountry": rowByIdCountry[d.id].name, "goodGenre": "Undefined", "goodISO": "Undefined", "goodGeneralGenre" : "Undefined","deezerFans": "Undefined" };
       }
@@ -250,8 +265,8 @@ countryPaths
   g.selectAll('.country').data(features.filter(d =>d.id !== "010")).select(".title").text(function(d) {  
     var countryUppercase = d.properties.goodCountry.charAt(0).toUpperCase() + d.properties.goodCountry.slice(1);
     var generalGenreUppercase = colorValue(d).charAt(0).toUpperCase() + colorValue(d).slice(1);
-    var genreUppercase = d.properties.goodGenre.charAt(0).toUpperCase() + d.properties.goodGenre.slice(1);
-    return "Country: " + countryUppercase + "\n" + "Genre" + ": " + generalGenreUppercase + " - " + genreUppercase + "\n" + "Deezer fans: " + d.properties.deezerFans
+  //  var genreUppercase = d.properties.goodGenre.charAt(0).toUpperCase() + d.properties.goodGenre.slice(1);
+    return "Country: " + countryUppercase + "\n" + "Genre" + ": " + generalGenreUppercase + "\n" + "Deezer fans: " + d.properties.deezerFans
 });
 
   countryPaths
@@ -291,7 +306,7 @@ var svgPiechart = d3.select("#mySidepanel")
   .innerRadius(0)
   .outerRadius(radius)
 
-  function openNav(countryID) {
+  function openNav() {
   document.getElementById("mySidepanel").style.width = "500px";
   document.getElementById("mySidepanel").style.height = "100%";
   document.getElementById("svgdivid").style.marginLeft = "500px" 
@@ -314,14 +329,12 @@ var svgPiechart = d3.select("#mySidepanel")
     isUndefined = true;
   }
 
-  // Get an array of the keys:
+// Get an array of the keys:
 let keysGenre = Object.keys(data1);
-
 // Then sort by using the keys to lookup the values in the original object:
 keysGenre.sort(function(a, b) { return data1[b] - data1[a] });
 
 
-console.log(keysGenre);
   //plusieurs meme genre "pop", regrouper et sum deezerfans ?
   document.getElementById("titre").innerHTML  = nomCountry 
 // A function that create / update the plot for a given variable:
