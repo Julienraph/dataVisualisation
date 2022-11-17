@@ -59,7 +59,7 @@ var countriesDataMap
 const loadAndProcessData = () =>
 Promise.all([
   //d3.tsv('https://unpkg.com/world-atlas@1.1.4/world/50m.json'),
-    d3.csv('http://127.0.0.1:5500/dataGroupBy.csv'),
+    d3.csv('https://raw.githubusercontent.com/Julienraph/dataVisualisation/mergeData/dataGroupBy.csv'),
     d3.json('https://unpkg.com/world-atlas@1.1.4/world/50m.json'),
     d3.tsv('https://unpkg.com/world-atlas@1.1.4/world/50m.tsv')
 ]).then(([tsvData, topoJSONdata,tsvCountryData]) => {
@@ -457,7 +457,7 @@ function createLi(data){
     }
 
     ul.appendChild(li);
-    li.innerHTML= key.charAt(0).toUpperCase() + key.slice(1) + " (" + (data[key] * 100 / deezerFansTotal).toFixed(2) + "%)" + " avec " + data[key] + " fans"  ;
+    li.innerHTML= key.charAt(0).toUpperCase() + key.slice(1) + " (" + (data[key] * 100 / deezerFansTotal).toFixed(2) + "%)" + " with " + data[key] + " fans"  ;
     li.id = key
   }
 }
