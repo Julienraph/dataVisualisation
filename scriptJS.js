@@ -155,7 +155,7 @@ slider.oninput = function() {
     currentDomainGenre = [...new Set(countries.features.map(item => item.properties.goodGeneralGenre))]
     features = countries.features;
     if(selectedCountryId != null) {
-    createPieChart(selectedCountryId)
+    createPieChart()
     }
     render();
   });
@@ -170,14 +170,14 @@ const onClick = d => {
 };
 
 const onCountryClick = id => {
+  selectedCountryId = id;
   if(id != null) {
     selectedColorValue = null
     openNav();
-    createPieChart(id)
+    createPieChart()
   } else {
     closeNav()
   }
-  selectedCountryId = id;
   render();
 }
 
@@ -282,8 +282,14 @@ countryPaths
  };
 
  function closeNav() {
+  document.getElementById("openbtn").style.visibility = "hidden"
   document.getElementById("mySidepanel").style.width = "0";
   document.getElementById("svgdivid").style.marginLeft = "0";
+}
+
+function retour() {
+  document.getElementById("openbtn").style.visibility = "hidden"
+  createPieChart()
 }
 
  
@@ -313,14 +319,17 @@ var svgPiechart = d3.select("#mySidepanel")
   document.getElementById("svgdivid").style.marginLeft = "500px" 
   }
 
-  function createPieChart(countryID) {
+  function createPieChart(genre) {
+  document.getElementById("openbtn").style.visibility = "hidden"
  // set the dimensions and margins of the graph
-
+ var countryID = selectedCountryId
  var data1 = {}
  var deezerFansTotal = 0;
  var isUndefined = false;
  var nomCountry
- var newdata = dataTSV.filter(function(row) {return row.goodISO == countryID && row.goodDate == year && row.goodGeneralGenre != "Other" && row.goodGeneralGenre != "Undefined"});
+ var newdata
+ if(genre == null) {
+ newdata = dataTSV.filter(function(row) {return row.goodISO == countryID && row.goodDate == year && row.goodGeneralGenre != "Other" && row.goodGeneralGenre != "Undefined"});
  var result = [];
       newdata.reduce(function(res, value) {
            if (!res[value.goodGeneralGenre]) {
@@ -333,11 +342,32 @@ var svgPiechart = d3.select("#mySidepanel")
  newdata = result;
  newdata.forEach(d => {
  nomCountry = d.goodCountry
-  if(d.deezerFans > 0) {
-    data1[d.goodGeneralGenre] = d.deezerFans
-    deezerFansTotal += d.deezerFans
+   if(d.deezerFans > 0) {
+     data1[d.goodGeneralGenre] = d.deezerFans
+     deezerFansTotal += d.deezerFans
+   }
+  });
+  } else {
+    document.getElementById("openbtn").style.visibility = "visible"
+    newdata = dataTSV.filter(function(row) {return row.goodISO == countryID && row.goodDate == year && row.goodGeneralGenre == genre});
+    var result = [];
+      newdata.reduce(function(res, value) {
+           if (!res[value.goodGenre]) {
+          res[value.goodGenre] = {goodDate: value.goodDate, goodCountry: value.goodCountry, goodGenre: value.goodGenre, goodISO: value.goodISO, deezerFans: 0 };
+          result.push(res[value.goodGenre])
+        }
+        res[value.goodGenre].deezerFans += +value.deezerFans;
+        return res;
+      }, {});
+    newdata = result;
+    newdata.forEach(d => {
+      nomCountry = d.goodCountry
+       if(d.deezerFans > 0) {
+         data1[d.goodGenre] = +d.deezerFans
+         deezerFansTotal += +d.deezerFans
+       }
+      });
   }
- });
   if(Object.keys(data1).length === 0) {
     nomCountry = countriesDataMap[countryID].name_long
     data1["Undefined"] = 1000
@@ -351,7 +381,7 @@ keysGenre.sort(function(a, b) { return data1[b] - data1[a] });
 
 
   //plusieurs meme genre "pop", regrouper et sum deezerfans ?
-  document.getElementById("titre").innerHTML  = nomCountry 
+  document.getElementById("titre").innerHTML  = nomCountry
 // A function that create / update the plot for a given variable:
 function update(data) {
 
@@ -422,19 +452,22 @@ function createLi(data){
 
   for (var key of keysGenre) {
     var li = document.createElement('li');
+    if(genre == null) {
     li.setAttribute('class','item');
+    }
 
     ul.appendChild(li);
-
     li.innerHTML= key.charAt(0).toUpperCase() + key.slice(1) + " (" + (data[key] * 100 / deezerFansTotal).toFixed(2) + "%)" + " avec " + data[key] + " fans"  ;
     li.id = key
   }
 }
+if (genre == null){
 const items = document.querySelectorAll('ol > li');
 items.forEach(item => {
 	item.addEventListener('click',(e)=>{
-		console.log(e.target.id);
+		createPieChart(e.target.id);
 	}
 	)
 })
+  }
 }
