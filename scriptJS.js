@@ -56,6 +56,7 @@ var domainColor
 var currentDomainGenre
 var dataTSV
 var countriesDataMap 
+var worldPiechart
 const loadAndProcessData = () =>
 Promise.all([
   //d3.tsv('https://unpkg.com/world-atlas@1.1.4/world/50m.json'),
@@ -81,8 +82,7 @@ Promise.all([
     });
     countriesDataMap = rowByIdCountry 
     countries.features.forEach(d => {
-      var newdata = tsvData.filter(function(row) {return row.goodISO == d.id && row.goodDate == year && row.goodGeneralGenre != "Other" && row.goodGeneralGenre != "Undefined"});
-   
+      var newdata = tsvData.filter(function(row) {return row.goodISO == d.id && row.goodDate == year && row.goodGeneralGenre != "Other" && row.goodGeneralGenre != "Undefined"});    
       var result = [];
       newdata.reduce(function(res, value) {
            if (!res[value.goodGeneralGenre]) {
@@ -115,6 +115,7 @@ Promise.all([
     return countries;
 });
 //////////////////////////////////////////////////
+
 var width = 1920,
     height = 1080;
 const svg = d3.select('svg')
@@ -153,8 +154,9 @@ slider.oninput = function() {
   year = slider.value
   loadAndProcessData().then(countries => {
     currentDomainGenre = [...new Set(countries.features.map(item => item.properties.goodGeneralGenre))]
+    console.log(currentDomainGenre)
     features = countries.features;
-    if(selectedCountryId != null) {
+    if(selectedCountryId != null || selectedColorValue != null) {
     createPieChart()
     }
     render();
@@ -162,14 +164,20 @@ slider.oninput = function() {
 }
 
 const onClick = d => {
+  worldPiechart = true
+  selectedColorValue = d;
   if(d != null) {
     selectedCountryId = null
+    openNav();
+    createPieChart()
+  } else {
+    closeNav()
   }
-  selectedColorValue = d;
   render();
 };
 
 const onCountryClick = id => {
+  worldPiechart = false
   selectedCountryId = id;
   if(id != null) {
     selectedColorValue = null
@@ -368,8 +376,29 @@ var svgPiechart = d3.select("#mySidepanel")
        }
       });
   }
+  if(worldPiechart == true) {
+    newdata = dataTSV.filter(function(row) {return row.goodDate == year && row.goodGeneralGenre == selectedColorValue});
+    console.log(newdata)
+    var result = [];
+      newdata.reduce(function(res, value) {
+           if (!res[value.goodGenre]) {
+          res[value.goodGenre] = {goodDate: value.goodDate, goodCountry: value.goodCountry, goodGenre: value.goodGenre, goodISO: value.goodISO, deezerFans: 0 };
+          result.push(res[value.goodGenre])
+        }
+        res[value.goodGenre].deezerFans += +value.deezerFans;
+        return res;
+      }, {});
+    newdata = result;
+    nomCountry = "World"
+    newdata.forEach(d => {
+       if(d.deezerFans > 0) {
+         data1[d.goodGenre] = +d.deezerFans
+         deezerFansTotal += +d.deezerFans
+       }
+      });
+  }
   if(Object.keys(data1).length === 0) {
-    nomCountry = countriesDataMap[countryID].name_long
+    nomCountry = worldPiechart ? "World" : countriesDataMap[countryID].name_long
     data1["Undefined"] = 1000
     isUndefined = true;
   }
@@ -458,7 +487,7 @@ function createLi(data){
 
   for (var key of keysGenre) {
     var li = document.createElement('li');
-    if(genre == null) {
+    if(genre == null && worldPiechart == false) {
     li.setAttribute('class','item');
     }
 
@@ -468,7 +497,7 @@ function createLi(data){
   }
 
 }
-if (genre == null){
+if (genre == null && worldPiechart == false){
 const items = document.querySelectorAll('ol > li');
 items.forEach(item => {
 	item.addEventListener('click',(e)=>{
