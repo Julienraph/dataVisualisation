@@ -408,7 +408,7 @@ u
   } else {
     return "rgb(107,107,107)"
   }})
-.attr("stroke", "white")
+.attr("stroke", "black")
 .style("stroke-width", "0.1px")
 .style("opacity", 1)
 // Now add the annotation. Use the centroid method to get the best coordinates)
@@ -418,10 +418,16 @@ v
   .enter()
   .append("text")
   .merge(v)
-  .text(function(d){ return d.data.key})
-  .attr("transform", function(d) { return "translate(" + arcGenerator.centroid(d) + ")";  })
+  .text(function(d){ 
+    if((d.data.value * 100 / deezerFansTotal) > 3) {
+
+    return d.data.key}})
+  .attr("class","textPie")
+  .attr("transform", function(d) { 
+    return "translate(" + arcGenerator.centroid(d) + ")";  })
   .style("text-anchor", "middle")
   .style("font-size", 17)
+  
 
 // remove the group that is not present anymore
 u
@@ -460,6 +466,7 @@ function createLi(data){
     li.innerHTML= key.charAt(0).toUpperCase() + key.slice(1) + " (" + (data[key] * 100 / deezerFansTotal).toFixed(2) + "%)" + " with " + data[key] + " fans"  ;
     li.id = key
   }
+
 }
 if (genre == null){
 const items = document.querySelectorAll('ol > li');
@@ -471,3 +478,5 @@ items.forEach(item => {
 })
   }
 }
+
+
