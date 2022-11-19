@@ -27,6 +27,13 @@ div {position: relative;}
     stroke-width: 0.9;
   }
 
+  .legendtext:hover {
+    stroke: white;
+    filter: brightness(120%);
+    stroke-width: 0.02;
+    font-size: 1.2em;
+  }
+
   .country.highlighted {
     stroke: white;
     filter: brightness(110%);

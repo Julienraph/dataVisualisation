@@ -1,11 +1,11 @@
-//////////////////     COLOR LEGEND FILE
+////////////////// LA LEGENDE
 const colorLegend = (selection, props) => {
     const { colorScale, circleRadius, spacing, textOffSet, backgroundRectWidth, onClick, selectedColorValue, currentDomainGenre } = props;
   
 
     const backgroundRect = selection.selectAll("rect")
     .data([null]);
-    const n = currentDomainGenre.length
+    const n = domainColor.length
     backgroundRect.enter().append('rect')
     .merge(backgroundRect)
         .attr("x", -circleRadius * 2)
@@ -16,15 +16,14 @@ const colorLegend = (selection, props) => {
         .attr("fill", "white")
         .attr("opacity",0.8);
     const groups = selection.selectAll('g')
-      .data(currentDomainGenre.sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'})));
+      .data(domainColor.sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'})));
     const groupsEnter = groups.enter().append('g').attr("class","tick")
     groupsEnter
       .merge(groups)
         .attr('transform', (d, i) =>
           `translate(0,${i * spacing})`
         )
-        .attr('opacity', d => 
-        (!selectedColorValue || d === selectedColorValue) ? 1 : 0.2)
+        .attr('opacity', 1)
         .on('click', d => onClick(
           d == selectedColorValue ? null : d
         ));
@@ -45,11 +44,13 @@ const colorLegend = (selection, props) => {
       .merge(groups.select('text'))
         .text(d => d.charAt(0).toUpperCase() + d.toLowerCase().slice(1))
         .attr("dy","0.32em")
-        .attr('x', textOffSet);
+        .attr('x', textOffSet)
+        .attr('class','legendtext')
+        .style('fill', d => currentDomainGenre.includes(d) ? "blue" : "black")
   }
   //////////////////////////////////////////////////
 
- ///////////////////////// LoadAndProcessData FILE
+ ///////////////////////// CHARGE ET PROCESS LES DATA
 var year = 2011
 var rangeColor = []
 var domainColor
